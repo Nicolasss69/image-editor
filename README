@@ -1,0 +1,114 @@
+//Copyright Calina Nicolas 2024
+
+IMAGE EDITOR
+This project's purpose is to create a program that edits images based on the 
+commands an user inputs.The scope of it is to implements a series of functions
+that can load and save an image in the PGM and PPM formats.The operations that
+were implemented in this project are:SELECT, SELECT ALL , ROTATE , CROP, 
+HISTOGRAM ,EQUALISE ,APPLY .The SELECT function is used in ROTATE and CROP,  
+and APPLY functions to select the area of the image that will be modified.
+SELECT ALL is used for going back to the full image after a SELECT function.
+The project solely focuses on the P2,P3,P5 and P6 formats and is made in C.
+The functionality is like this: the user loads an image, performs the desired
+operation and then saves the image in the desired format.After he finishes 
+his operation he writes EXIT and the program stops.
+
+LOAD function:
+The LOAD function is used to load an image in the program.The program only
+holds one image at a time , this is why the program uses a variable , isLoaded
+which holds if an image is already loaded before doing an opperation.The load 
+function takes as parameters the name of the image , and the imageit wants to 
+load.I made a structure that stores the data of the function such as its height
+, width ,the maximum value of the pixels and the matrix of pixels , which itself
+has a structure that stores the values for red , green and blue pixels.
+The function opens the file and checks if it was opened correctly.It then 
+allocates memory for the imageData structure and populates it with data.
+First it takes the magicWords , the dimension of the image and the maximum
+value of a pixel.It then allocates memory for the matrix of pixels and populates
+it according to the format of the image using the matrix_read functions.
+I have made 4 separate matrix_read function for each type of image format.
+For the greyscale images it only populates it with the value of the red pixel
+and then through the program i only work with it for the calculations.The 
+difference between the read ascii and binary functions are that in the ascii
+type I use the fscanf function whereas in the binary type I use the fread.
+In the end I am setting the x and y coordinates to be the same as the image
+dimensions and the isLoaded variable to 1.
+
+SAVE function:
+The SAVE function saves the loaded image .It works by taking as arguments the
+desired name the user wants to give to the new image and the image type.
+If it reads SAVE <name> ascii it will save it ascii and if left blank it will
+save it as bianry.Both the save_binary and save_ascii work the same by using 
+the matrix_save functions for the rgb and greyscale formats.First they both 
+check if the open the image where you want to save and check if it was open
+succesfully.Then they convert the image to the format the user want to save in
+and they call the matrix_save functions.Before calling the matrix_save they
+also print the magic word , the dimensions and the maximum value of the pixel.
+The save binary uses the fwrite function and the save ascii uses the fprintf.
+
+SELECT function:
+The SELECT function works by taking as parameters the x and y coordinates for
+the wanted selection.It checks if the image is loaded , then it checks if 
+the coordinates are valid numbers , meaning they are not strings  , using the
+strtol function , then it converts them to integers using the atoi function 
+and the orders the coordinates asscendingy yusing the order_coordinates 
+function.Using the verifi_range it checks if the coordinates are positive or
+are within the range of the image dimensions.It then updates the x and y values
+and prints them at the output.
+
+SELECT ALL function:
+The SELECT ALL functions gives the values of x and y coordinates to the ones
+of the full matrix size.
+
+ROTATE function:
+The scope of the ROTATE function is to rotate the whole image or a selection
+of the matrix with a given angle.The angles used in the program are +-90 ,+-180
+, +-270 , +-360 and 0 degrees.The function first checks if there is an image 
+loaded or if the image is valid . It converts the angle to int using the atoi
+function.Because rotating with -angle degrees is the same as rotating with
+360-angle degrees the program converts all the negative values to positive
+ones and it uses the neg variable to remember if the angle is negative or not.
+It then checks if the angle is valid within the program's use and then rotates
+the images based on their format.If the user want to rotate an image 180 degrees
+then the function just rotates the image twice , the same with rotating 270
+degrees.For actually rotating it uses 4 functions for the greyscale, rgb and 
+full matrix situations.The functions allocate space for a new matrix and then
+it populates it with the elements of the selection or the whole matrix that
+correspond with rotating 90 degrees.The difference between the full rotation
+and the selection is that in the end it swaps the image's dimensions.
+
+CROP function:
+The CROP function works by taking the selection coordinates and cropping the 
+image to the wanted size . It does it by creating an auxiliary matrix and 
+populates it with the corresponding elements from the wanted crop selection.
+Then it deallocates memory for the original matrix , changes the height and
+width and points the image pixel matrix to the new cropped one.
+
+HISTOGRAM function:
+The HISTOGRAM function calculates and prints the histogram of the matrix.
+It takes the input as parameter and first checks if an image is loaded and 
+if the input corresponds to how the function should work.The x and y are the 
+number of bins and the numbers of maximum star for the histogram.It checks if 
+x is a power of 2 using the ispower2 function and if the x and y are within 
+valid boundries. The histogram only works for Black and white images so it prints
+a message if the image is color.It then allocates memory for a frequency histogram
+matrix and then calculates the number of stars for each bin and for each elements 
+in each bin using a formula given .
+
+EQUALIZE function:
+The EQUALIZE function is used for equalizing the selection.It does it for 
+black and white images only and checks if the image is loaded or color.It calculates
+the area of the pixels in the matrix , inside a vector it calculates the frequency
+of each pixel , then in another vector it calculates the sum of the pixel_frequency
+and uses a formula for calculating the new value of each pixel and then it changes it.
+In the end it frees the memory for the vectors alocated.
+
+APPLY function:
+The APPLY function applies filters on a selection of the image. The filters 
+applied are : EDGE , SHARPEN , BLUR and GAUSSIAN BLUR.The way it works is 
+it allocates memory for an auxiliary matrix and populates it with the new
+pixels needed for the applied filter . It works by taking a pixel that is 
+not on the margin of the matrix and multipliying itself and its neighbours
+with some numbers that depend on the wanted filter and then sums the toghether
+and add it to the new value of the pixel in the original matrix.The APPLY 
+only works on rgb images and it prints a message if it is black and white.
